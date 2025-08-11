@@ -1,17 +1,27 @@
 import { UserTabs } from "../UserTabs";
+import { CategoryTabs } from "../CategoryTabs";
 
 export const Controls = ({
   users,
   categories,
-  selectedUsers,
+  selectedUser,
   selectedCategories,
+  searchQuery,
+  onSearchQuery,
+  clearCategories,
+  onUserChange,
+  onCategorySelect,
 }) => {
   return (
     <div className="block">
       <nav className="panel">
         <p className="panel-heading">Filters</p>
 
-        <UserTabs users={users} selectedUsers={selectedUsers} />
+        <UserTabs
+          users={users}
+          selectedUser={selectedUser}
+          onUserChange={onUserChange}
+        />
 
         <div className="panel-block">
           <p className="control has-icons-left has-icons-right">
@@ -20,7 +30,10 @@ export const Controls = ({
               type="text"
               className="input"
               placeholder="Search"
-              value="qwe"
+              value={searchQuery}
+              onChange={event => {
+                onSearchQuery(event.target.value);
+              }}
             />
 
             <span className="icon is-left">
@@ -33,57 +46,29 @@ export const Controls = ({
                 data-cy="ClearButton"
                 type="button"
                 className="delete"
+                onClick={() => onSearchQuery('')}
               />
             </span>
           </p>
         </div>
 
-        <div className="panel-block is-flex-wrap-wrap">
-          <a
-            href="#/"
-            data-cy="AllCategories"
-            className="button is-success mr-6 is-outlined"
-          >
-            All
-          </a>
-
-          <a
-            data-cy="Category"
-            className="button mr-2 my-1 is-info"
-            href="#/"
-          >
-            Category 1
-          </a>
-
-          <a
-            data-cy="Category"
-            className="button mr-2 my-1"
-            href="#/"
-          >
-            Category 2
-          </a>
-
-          <a
-            data-cy="Category"
-            className="button mr-2 my-1 is-info"
-            href="#/"
-          >
-            Category 3
-          </a>
-          <a
-            data-cy="Category"
-            className="button mr-2 my-1"
-            href="#/"
-          >
-            Category 4
-          </a>
-        </div>
+        <CategoryTabs
+          categories={categories}
+          selectedCategories={selectedCategories}
+          clearCategories={clearCategories}
+          onCategorySelect={onCategorySelect}
+        />
 
         <div className="panel-block">
           <a
             data-cy="ResetAllButton"
             href="#/"
             className="button is-link is-outlined is-fullwidth"
+            onClick={() => {
+              onSearchQuery('');
+              onUserChange('');
+              clearCategories('');
+            }}
           >
             Reset all filters
           </a>

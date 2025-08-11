@@ -25,10 +25,36 @@ const products = productsFromServer.map((product) => {
   };
 });
 
+function prepareProducts(apiProducts, {
+  selectedCategories,
+  selectedUser,
+  searchQuery,
+}) {
+  return apiProducts.filter(product => {
+    const hasCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(product.category.id);
+
+    const isUser = selectedUser === '' || product.user.id === selectedUser;
+
+    const hasSearchQuery =
+      searchQuery === '' ||
+      product.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return hasCategory && isUser && hasSearchQuery;
+  })
+}
+
 export const App = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const visibleProducts = prepareProducts(products, {
+    selectedCategories,
+    selectedUser,
+    searchQuery,
+  });
 
   return (
     <div className="section">
@@ -38,12 +64,29 @@ export const App = () => {
         <Controls
           users={usersFromServer}
           categories={categoriesFromServer}
-          selectedUsers={selectedUsers}
+          selectedUser={selectedUser}
           selectedCategories={selectedCategories}
           searchQuery={searchQuery}
+          onSearchQuery={value => setSearchQuery(value)}
+          clearCategories={() => setSelectedCategories([])}
+          onUserChange={userId => setSelectedUser(userId)}
+          onCategorySelect={categoryId => {
+            if (!selectedCategories.includes(categoryId)) {
+              setSelectedCategories(prev => [...prev, categoryId]);
+            } else {
+              setSelectedCategories(prev => {
+                const spliceIndex = prev.findIndex(c => c.id === categoryId);
+                const newPrev = [...prev];
+
+                newPrev.splice(spliceIndex, 1);
+
+                return newPrev;
+              });
+            }
+          }}
         />
 
-        <Table products={products} />
+        <Table products={visibleProducts} />
       </div>
     </div>
   );
