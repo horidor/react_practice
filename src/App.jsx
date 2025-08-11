@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
-import React from 'react';
+import { React, useState } from 'react';
 import './App.scss';
-import { useState } from 'react';
 
 import { Controls } from './components/Controls';
 import { Table } from './components/Table';
@@ -10,7 +9,7 @@ import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
 import productsFromServer from './api/products';
 
-const products = productsFromServer.map((product) => {
+const products = productsFromServer.map(product => {
   const category = categoriesFromServer.find(
     serverCategory => product.categoryId === serverCategory.id,
   ); // find by product.categoryId
@@ -25,11 +24,12 @@ const products = productsFromServer.map((product) => {
   };
 });
 
-function prepareProducts(apiProducts, {
-  selectedCategories,
-  selectedUser,
-  searchQuery,
-}) {
+const headers = ['ID', 'Product', 'Category', 'User'];
+
+function prepareProducts(
+  apiProducts,
+  { selectedCategories, selectedUser, searchQuery },
+) {
   return apiProducts.filter(product => {
     const hasCategory =
       selectedCategories.length === 0 ||
@@ -42,13 +42,14 @@ function prepareProducts(apiProducts, {
       product.name.toLowerCase().includes(searchQuery.toLowerCase());
 
     return hasCategory && isUser && hasSearchQuery;
-  })
+  });
 }
 
 export const App = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortMethod, setSortMethod] = useState({});
 
   const visibleProducts = prepareProducts(products, {
     selectedCategories,
@@ -86,7 +87,28 @@ export const App = () => {
           }}
         />
 
-        <Table products={visibleProducts} />
+        <Table
+          products={visibleProducts}
+          headers={headers}
+          sortMethod={sortMethod}
+          onSortSelect={sortColumn => {
+            if (sortMethod === null && !(sortColumn in sortMethod)) {
+              setSortMethod({ sortColumn: 1 });
+
+              return;
+            }
+
+            if (sortMethod[sortColumn] === 1) {
+              setSortMethod({ sortColumn: -1 });
+
+              return;
+            }
+
+            if (sortMethod[sortColumn] === -1) {
+              setSortMethod({});
+            }
+          }}
+        />
       </div>
     </div>
   );

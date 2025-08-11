@@ -1,5 +1,5 @@
-import { UserTabs } from "../UserTabs";
-import { CategoryTabs } from "../CategoryTabs";
+import { UserTabs } from '../UserTabs';
+import { CategoryTabs } from '../CategoryTabs';
 
 export const Controls = ({
   users,
@@ -42,12 +42,14 @@ export const Controls = ({
 
             <span className="icon is-right">
               {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-              <button
-                data-cy="ClearButton"
-                type="button"
-                className="delete"
-                onClick={() => onSearchQuery('')}
-              />
+              {searchQuery === '' || (
+                <button
+                  data-cy="ClearButton"
+                  type="button"
+                  className="delete"
+                  onClick={() => onSearchQuery('')}
+                />
+              )}
             </span>
           </p>
         </div>
