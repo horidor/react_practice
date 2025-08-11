@@ -28,9 +28,9 @@ const headers = ['ID', 'Product', 'Category', 'User'];
 
 function prepareProducts(
   apiProducts,
-  { selectedCategories, selectedUser, searchQuery },
+  { selectedCategories, selectedUser, searchQuery, sortMethod },
 ) {
-  return apiProducts.filter(product => {
+  const visibleProducts = apiProducts.filter(product => {
     const hasCategory =
       selectedCategories.length === 0 ||
       selectedCategories.includes(product.category.id);
@@ -43,6 +43,35 @@ function prepareProducts(
 
     return hasCategory && isUser && hasSearchQuery;
   });
+
+  // I understand this is a bad way to sort due to literals
+  // and how i made my products array but i had time constraints
+  if (Object.keys(sortMethod).length !== 0) {
+    const sortingBy = Object.keys(sortMethod)[0];
+    const sortOrder = sortMethod[sortingBy];
+
+    visibleProducts.sort((product1, product2) => {
+      switch (sortingBy) {
+        case 'ID':
+          return sortOrder * (product1.id - product2.id);
+        case 'Product':
+          return sortOrder * product1.name.localeCompare(product2.name);
+        case 'Category':
+          return (
+            sortOrder *
+            product1.category.title.localeCompare(product2.category.title)
+          );
+        case 'User':
+          return (
+            sortOrder * product1.user.name.localeCompare(product2.user.name)
+          );
+        default:
+          return 0;
+      }
+    });
+  }
+
+  return visibleProducts;
 }
 
 export const App = () => {
@@ -55,6 +84,7 @@ export const App = () => {
     selectedCategories,
     selectedUser,
     searchQuery,
+    sortMethod,
   });
 
   return (
@@ -92,14 +122,17 @@ export const App = () => {
           headers={headers}
           sortMethod={sortMethod}
           onSortSelect={sortColumn => {
-            if (sortMethod === null && !(sortColumn in sortMethod)) {
-              setSortMethod({ sortColumn: 1 });
+            if (
+              Object.keys(sortMethod).length === 0 ||
+              !(sortColumn in sortMethod)
+            ) {
+              setSortMethod({ [sortColumn]: 1 });
 
               return;
             }
 
             if (sortMethod[sortColumn] === 1) {
-              setSortMethod({ sortColumn: -1 });
+              setSortMethod({ [sortColumn]: -1 });
 
               return;
             }
