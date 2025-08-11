@@ -28,13 +28,20 @@ const products = productsFromServer.map((product) => {
 export const App = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <div className="section">
       <div className="container">
         <h1 className="title">Product Categories</h1>
 
-        <Controls />
+        <Controls
+          users={usersFromServer}
+          categories={categoriesFromServer}
+          selectedUsers={selectedUsers}
+          selectedCategories={selectedCategories}
+          searchQuery={searchQuery}
+        />
 
         <Table products={products} />
       </div>
